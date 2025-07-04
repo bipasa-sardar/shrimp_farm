@@ -1,3 +1,4 @@
+import { account, databases } from '@/lib/appwrite';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Picker } from '@react-native-picker/picker';
 import { Link } from 'expo-router';
@@ -5,6 +6,7 @@ import React, { useState } from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   ScrollView,
   Text,
@@ -16,7 +18,6 @@ import {
 import { ID } from 'react-native-appwrite';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import './global.css';
-import { account } from './lib/appwrite';
 
 const Signup = () => {
   const [role, setRole] = useState('owner');
@@ -27,12 +28,19 @@ const Signup = () => {
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const [secureText, setSecureText] = useState(true);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const handaleSignup = async () => {
     setLoading(true);
     try {
-      await account.create(ID.unique(), email, password, name);
-      // Save phone, role, and ownerId to your database if needed
+      const user = await account.create(ID.unique(), email, password, name);
+      await databases.createDocument(
+        process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID!,
+        process.env.EXPO_PUBLIC_APPWRITE_USER_COLLECTION_ID!,
+        ID.unique(),
+        { name, phone, role }
+      );
+      setShowSuccess(true); // Show custom modal
       console.log("Signup successful with email:", email, "role:", role, "ownerId:", ownerId);
     } catch (error) {
       console.error("Signup failed:", error);
@@ -183,6 +191,25 @@ const Signup = () => {
               Already have an account?
               <Link href="/login"><Text className="text-blue-600"> Log in</Text></Link>
             </Text>
+
+            {/* Success Modal */}
+            <Modal transparent visible={showSuccess} animationType="fade">
+              <View className="flex-1 justify-center items-center bg-black/40">
+                <View className="bg-white w-11/12 max-w-sm p-6 rounded-2xl shadow-lg items-center">
+                  <Text className="text-xl font-bold text-green-600 mb-2">Signup Successful!</Text>
+                  <Text className="text-base text-gray-600 text-center mb-4">
+                    Your account has been created successfully.
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => setShowSuccess(false)}
+                    className="bg-green-500 px-6 py-2 rounded-xl"
+                   >
+                    <Text className="text-white font-semibold text-base">OK</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+
           </ScrollView>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
