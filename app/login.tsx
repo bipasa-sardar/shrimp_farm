@@ -1,5 +1,6 @@
+import { account } from "@/lib/appwrite";
 import { Ionicons } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   SafeAreaView,
@@ -8,44 +9,50 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { account } from "./lib/appwrite";
 
 export default function LoginScreen() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [secureText, setSecureText] = useState(true);
 
-
   const handleLogin = async () => {
     setLoading(true);
-    console.log("Attempting to log in with email:", email,password);
+    console.log("Attempting to log in with email:", email, password);
     try {
       await account.createEmailPasswordSession(email, password);
-      console.log("Logging in with email:", email);
+      // Redirect to /root/try after successful login
+      router.replace("/root/try");
     } catch (error) {
       console.error("Login failed:", error);
-      
-    }finally{
-      // Reset fields or handle post-login actions
+    } finally {
       setEmail("");
       setPassword("");
       setLoading(false);
     }
-  }
+  };
   return (
     <SafeAreaView className="flex-1 bg-blue-50">
       {/* Tabs */}
       <View className="flex-row justify-center space-x-8 pt-16 pb-6 bg-white shadow-md rounded-b-3xl">
-        <Text className="text-blue-600 text-xl font-bold border-b-4 border-blue-600 pb-2 px-4" >Log in</Text>
-        <Link href="/signup" className="ml-6"><Text className="text-gray-400 text-xl font-bold pb-2 px-5 ml-16">Sign up</Text></Link>
+        <Text className="text-blue-600 text-xl font-bold border-b-4 border-blue-600 pb-2 px-4">
+          Log in
+        </Text>
+        <Link href="/signup" className="ml-6">
+          <Text className="text-gray-400 text-xl font-bold pb-2 px-5 ml-16">
+            Sign up
+          </Text>
+        </Link>
       </View>
 
       {/* Card */}
       <View className="flex-1 items-center justify-start px-6 pt-10 bg-white">
         <View className="w-full bg-white rounded-2xl shadow-lg p-6">
           {/* Email input */}
-          <Text className="text-gray-700 mb-1 font-bold text-1xl " >Your Email</Text>
+          <Text className="text-gray-700 mb-1 font-bold text-1xl ">
+            Your Email
+          </Text>
           <View className="w-full mb-4">
             <TextInput
               className="border border-gray-300 rounded-2xl px-4 py-3 text-base bg-gray-50"
@@ -88,11 +95,15 @@ export default function LoginScreen() {
           </View>
 
           {/* Continue button */}
-          <TouchableOpacity onPress={handleLogin} className="w-full bg-blue-500 py-3 rounded-md mb-6 shadow">
-            <Text className="text-white text-center font-semibold text-lg">Continue</Text>
+          <TouchableOpacity
+            onPress={handleLogin}
+            className="w-full bg-blue-500 py-3 rounded-md mb-6 shadow"
+          >
+            <Text className="text-white text-center font-semibold text-lg">
+              Continue
+            </Text>
           </TouchableOpacity>
 
-          {/* OR line */}
           <View className="flex-row items-center w-full mb-6">
             <View className="flex-1 h-px bg-gray-300" />
             <Text className="mx-2 text-gray-400">Or</Text>
@@ -107,7 +118,9 @@ export default function LoginScreen() {
         </View>
         <Text className="mt-8 text-gray-500">
           Don’t have an account?
-          <Link href="/signup"><Text className="text-blue-500"> Sign up</Text></Link>
+          <Link href="/signup">
+            <Text className="text-blue-500"> Sign up</Text>
+          </Link>
         </Text>
       </View>
     </SafeAreaView>
