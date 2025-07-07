@@ -23,7 +23,7 @@ export default function LoginScreen() {
     try {
       await account.createEmailPasswordSession(email, password);
       // Redirect to /root/try after successful login
-      router.replace("/root/try");
+      router.replace("/(root)/user/page");
     } catch (error) {
       console.error("Login failed:", error);
     } finally {
